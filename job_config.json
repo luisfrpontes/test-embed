@@ -1,0 +1,93 @@
+{
+  "job_definitions": {
+    "sample_notebook_job": {
+      "name": "Sample Notebook Processing Job",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Repos/test-embed/sample_notebook",
+        "base_parameters": {
+          "input_path": "/tmp/input",
+          "output_path": "/tmp/output", 
+          "environment": "dev"
+        }
+      },
+      "new_cluster": {
+        "spark_version": "11.3.x-scala2.12",
+        "node_type_id": "i3.xlarge",
+        "num_workers": 2,
+        "spark_conf": {
+          "spark.sql.adaptive.enabled": "true",
+          "spark.sql.adaptive.coalescePartitions.enabled": "true"
+        }
+      },
+      "timeout_seconds": 3600,
+      "max_retries": 2,
+      "email_notifications": {
+        "on_failure": ["admin@company.com"],
+        "on_success": ["team@company.com"]
+      }
+    },
+    "python_script_job": {
+      "name": "Python Script Processing Job",
+      "spark_python_task": {
+        "python_file": "/Workspace/Repos/test-embed/databricks_job.py",
+        "parameters": [
+          "--input-path", "/tmp/input",
+          "--output-path", "/tmp/output",
+          "--environment", "dev",
+          "--num-records", "100"
+        ]
+      },
+      "new_cluster": {
+        "spark_version": "11.3.x-scala2.12", 
+        "node_type_id": "i3.xlarge",
+        "num_workers": 1
+      },
+      "libraries": [
+        {
+          "pypi": {
+            "package": "pandas>=1.5.0"
+          }
+        },
+        {
+          "pypi": {
+            "package": "numpy>=1.21.0"
+          }
+        }
+      ],
+      "timeout_seconds": 1800,
+      "max_retries": 3
+    }
+  },
+  "environments": {
+    "dev": {
+      "workspace_url": "https://your-dev-workspace.cloud.databricks.com",
+      "cluster_policy_id": "dev-policy-id",
+      "input_path": "/FileStore/shared_uploads/dev/input",
+      "output_path": "/FileStore/shared_uploads/dev/output"
+    },
+    "staging": {
+      "workspace_url": "https://your-staging-workspace.cloud.databricks.com", 
+      "cluster_policy_id": "staging-policy-id",
+      "input_path": "/mnt/staging/input",
+      "output_path": "/mnt/staging/output"
+    },
+    "prod": {
+      "workspace_url": "https://your-prod-workspace.cloud.databricks.com",
+      "cluster_policy_id": "prod-policy-id", 
+      "input_path": "/mnt/prod/input",
+      "output_path": "/mnt/prod/output"
+    }
+  },
+  "schedules": {
+    "daily_processing": {
+      "quartz_cron_expression": "0 0 2 * * ?",
+      "timezone_id": "UTC",
+      "description": "Daily processing at 2 AM UTC"
+    },
+    "hourly_processing": {
+      "quartz_cron_expression": "0 0 * * * ?",
+      "timezone_id": "UTC", 
+      "description": "Hourly processing"
+    }
+  }
+}
